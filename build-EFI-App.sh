@@ -1,3 +1,4 @@
+ARCH="x86_64"
 FILE="example.c"
 OBJDIR="output"
 OUTPUT="$OBJDIR/compiled.o"
@@ -7,7 +8,7 @@ mkdir -p "$OBJDIR"
 # target triple for x86_64 PE/COFF
 TARGET="-target x86_64-pc-windows-msvc"
 
-INCLUDES="-I./includes -I./gnu/inc"
+INCLUDES="-I./gnu-inc -I./gnu-inc/$ARCH"
 CFLAGS="$TARGET $INCLUDES -O2 -ffreestanding -fshort-wchar -fno-exceptions -fno-stack-protector -fno-builtin -nostdlib -mno-red-zone -Wall"
 
 clang $CFLAGS -c "$FILE" -o "$OUTPUT"
