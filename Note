@@ -1,2 +1,6 @@
-Note: All included UEFI Shell binaries are borrowed from pbatard's project.
+Note: 
+-All included UEFI Shell binaries are borrowed from pbatard's project.
 See https://github.com/pbatard for license and original source.
+
+-GNU-EFI apps examples are borrowed from gnu-efi repo
+See https://github.com/rhboot/gnu-efi/tree/master/apps for license and original source.
