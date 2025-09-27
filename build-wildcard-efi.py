@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 
 # Linker executable and base flags
-LFLAGS = ["lld-link", "/subsystem:efi_application", "/entry:efi_main"]
+LFLAGS = ["lld-link", "/subsystem:efi_application", "/entry:efi_main", "build/*.o"]
 
 # Get directory argument
 if len(sys.argv) < 2:
