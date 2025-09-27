@@ -2,23 +2,43 @@ import subprocess
 import os
 from pathlib import Path
 
-ARCH="x86_64"
-TOOL_PATH_CONFIG="GNU-EFI-Toolkits"
-INCLUDES=f"-I./{TOOL_PATH_CONFIG}/gnu-inc -I./{TOOL_PATH_CONFIG}/gnu-inc/{ARCH}"
-TARGET="-target x86_64-pc-windows-msvc"
-CFLAGS=f"{INCLUDES} {TARGET} -O2 -ffreestanding -fshort-wchar -fno-exceptions -fno-stack-protector -fno-builtin -nostdlib -Wall "
+# Configuration
+ARCH = "x86_64"
+TOOL_PATH = Path.cwd()  # Use current OS working directory
+INCLUDES = f"-I{TOOL_PATH}/gnu-inc -I{TOOL_PATH}/gnu-inc/{ARCH} -I{TOOL_PATH}/edk2-inc"
+TARGET = "-target x86_64-pc-windows-msvc"
+CFLAGS = f"{INCLUDES} {TARGET} -O2 -ffreestanding -fshort-wchar -fno-exceptions -fno-stack-protector -fno-builtin -nostdlib -Wall"
+
+CLANG_CMD = "clang"  # Change to full path if needed, e.g., D:/Myfiles/PyQt6 Editor/bin/clang.exe
 
 def wildCard_CLANG(startDir: str):
-    for dirpath, dirnames, filenames in os.walk(os.path.abspath(startDir)):
+    startDir = Path(startDir).resolve()
+    for dirpath, dirnames, filenames in os.walk(startDir):
         for d in dirnames:
-            print(os.path.join(dirpath, d))
+            print(Path(dirpath) / d)
 
         for f in filenames:
-            path = Path(os.path.join(dirpath, f))
+            path = Path(dirpath) / f
             print(path)
 
             if path.suffix == ".c":
-                print(f"compiling: {path}")
-                subprocess.call([CFLAGS, f"-c {path} -o {path.name}.o"])
+                out_file = path.with_suffix(".o")
+                print(f"Compiling: {path} -> {out_file}")
+
+                # Build the command
+                cmd = [
+                    CLANG_CMD,
+                    *CFLAGS.split(),
+                    "-c",
+                    str(path),
+                    "-o",
+                    str(out_file)
+                ]
+
+                # Execute the compiler
+                subprocess.run(cmd, check=True)
             else:
-                print(f"skipped: {path}")
+                print(f"Skipped: {path}")
+
+# Example usage
+# wildCard_CLANG("src")
