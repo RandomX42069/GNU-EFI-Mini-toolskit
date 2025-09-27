@@ -1,44 +1,32 @@
 import subprocess
 import os
 from pathlib import Path
+import sys
 
-# Configuration
 ARCH = "x86_64"
-TOOL_PATH = Path.cwd()  # Use current OS working directory
-INCLUDES = f"-I{TOOL_PATH}/gnu-inc -I{TOOL_PATH}/gnu-inc/{ARCH} -I{TOOL_PATH}/edk2-inc"
-TARGET = "-target x86_64-pc-windows-msvc"
-CFLAGS = f"{INCLUDES} {TARGET} -O2 -ffreestanding -fshort-wchar -fno-exceptions -fno-stack-protector -fno-builtin -nostdlib -Wall"
+INCLUDES = [f"-I./gnu-inc", f"-I./gnu-inc/{ARCH}", f"-I./edk2-inc", f"-I./custom-inc"] # since some components are coming from edk2 so 
+TARGET = ["-target", "x86_64-pc-windows-msvc"]                                                            # I guess I'll make a full kit in the future
+CFLAGS = ["clang", *INCLUDES, *TARGET,
+          "-O2", "-ffreestanding", "-fshort-wchar",
+          "-fno-exceptions", "-fno-stack-protector",
+          "-fno-builtin", "-nostdlib", "-Wall"]
 
-CLANG_CMD = "clang"  # Change to full path if needed, e.g., D:/Myfiles/PyQt6 Editor/bin/clang.exe
+# Get directory argument
+if len(sys.argv) < 2:
+    print("Usage: python build-wildcard.py <directory>")
+    sys.exit(1)
+
+DIR = sys.argv[1]
 
 def wildCard_CLANG(startDir: str):
-    startDir = Path(startDir).resolve()
-    for dirpath, dirnames, filenames in os.walk(startDir):
-        for d in dirnames:
-            print(Path(dirpath) / d)
-
+    for dirpath, _, filenames in os.walk(os.path.abspath(startDir)):
         for f in filenames:
             path = Path(dirpath) / f
-            print(path)
-
             if path.suffix == ".c":
                 out_file = path.with_suffix(".o")
-                print(f"Compiling: {path} -> {out_file}")
-
-                # Build the command
-                cmd = [
-                    CLANG_CMD,
-                    *CFLAGS.split(),
-                    "-c",
-                    str(path),
-                    "-o",
-                    str(out_file)
-                ]
-
-                # Execute the compiler
-                subprocess.run(cmd, check=True)
+                print(f"compiling: {path} -> {out_file}")
+                subprocess.run(CFLAGS + ["-c", str(path), "-o", str(out_file)], check=True)
             else:
-                print(f"Skipped: {path}")
+                print(f"skipped: {path}")
 
-# Example usage
-# wildCard_CLANG("src")
+wildCard_CLANG(DIR)
