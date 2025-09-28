@@ -1,0 +1,1 @@
+#define PcdMaximumAsciiStringLength 1024
